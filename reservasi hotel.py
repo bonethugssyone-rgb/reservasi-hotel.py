@@ -681,59 +681,99 @@ elif pilihan_menu == "🔍 Cek Detail & Check-Out":
             
             # --- PILIHAN METODE PEMBAYARAN PELUNASAN ---
             if grand_total_checkout > 0:
+                
                 metode_pelunasan = st.selectbox(
-                    "Pilih Metode Pembayaran Pelunasan:", 
+                    "Pilih Metode Pembayaran Pelunasan:",
                     ["Transfer BCA", "Mandiri Virtual Account", "GoPay", "OVO", "Dana"],
                     key="metode_pelunasan"
                 )
                 
-                # Input nomor rekening / nomor e-wallet secara dinamis
+                valid_pelunasan = False
+                
                 if "Transfer" in metode_pelunasan or "Account" in metode_pelunasan:
+                    
                     no_sumber_pelunasan = st.text_input(
-                        f"Masukkan Nomor Rekening Bank Anda ({metode_pelunasan}):", 
-                        placeholder="Contoh: 801280",
+                        f"Masukkan Nomor Rekening Bank Anda ({metode_pelunasan}):",
+                        placeholder="Contoh: 1234567890",
                         key="no_rek_pelunasan"
                     )
+                    
+                    if no_sumber_pelunasan:
+                        if not no_sumber_pelunasan.isdigit():
+                            st.error("Nomor rekening hanya boleh berisi angka.")
+                        elif len(no_sumber_pelunasan) < 10:
+                            st.error("Nomor rekening minimal 10 digit.")
+                        elif len(no_sumber_pelunasan) > 16:
+                            st.error("Nomor rekening maksimal 16 digit.")
+                        else:
+                            valid_pelunasan = True
+                        
                 else:
                     no_sumber_pelunasan = st.text_input(
-                        f"Masukkan Nomor HP Akun {metode_pelunasan} Anda:", 
-                        placeholder="Contoh: 08123456xxx",
+                        f"Masukkan Nomor HP Akun {metode_pelunasan} Anda:",
+                        placeholder="Contoh: 081234567890",
                         key="no_hp_pelunasan"
                     )
+                    
+                    if no_sumber_pelunasan:
+                        if not no_sumber_pelunasan.isdigit():
+                            st.error("Nomor HP hanya boleh berisi angka.")
+                        elif len(no_sumber_pelunasan) < 10:
+                            st.error("Nomor HP minimal 10 digit.")
+                        elif len(no_sumber_pelunasan) > 13:
+                            st.error("Nomor HP maksimal 13 digit.")
+                        else:
+                            valid_pelunasan = True
+                        
             else:
                 metode_pelunasan = "Otomatis Lunas (Tanpa Tagihan)"
                 no_sumber_pelunasan = "-"
-                st.success("Tagihan Anda sudah lunas! Silakan langsung klik tombol check-out di bawah.")
+                valid_pelunasan = True
+                
+                st.success(
+                    "Semua tagihan telah lunas. Silakan lanjutkan proses check-out."
+                )
             # -------------------------------------------
             
-            # Tombol eksekusi check-out, balikin kamar jadi ijo (Tersedia) dan pindahin data ke arsip histori
-            if st.button(f"Konfirmasi Pelunasan & Proses Check-Out Selesai", type="primary"):
+            # Tombol eksekusi check-out
+            if st.button("Konfirmasi Pelunasan & Proses Check-Out Selesai", type="primary"):
                 if grand_total_checkout > 0 and not no_sumber_pelunasan:
-                    st.error(f"Mohon isi Nomor Rekening atau Nomor HP {metode_pelunasan} Anda terlebih dahulu untuk validasi pelunasan!")
+                    st.error(
+                        f"Mohon isi Nomor Rekening atau Nomor HP {metode_pelunasan} Anda terlebih dahulu!"
+                    )
+                elif grand_total_checkout > 0 and not valid_pelunasan:
+                    st.error(
+                        "Nomor rekening / nomor HP tidak valid. Pastikan hanya berisi angka dan minimal 10 digit."
+                    )
                 else:
                     for k in st.session_state.kamar_data:
                         if k["No Kamar"] == tamu["kamar"]:
                             k["Status"] = "🟩 Tersedia"
-                    
-                    # Mencatat metode pelunasan ke dalam riwayat transaksi final
-                    info_metode_final = f"{metode_pelunasan} ({no_sumber_pelunasan})" if grand_total_checkout > 0 else "Lunas Sejak Awal"
-                    
+                            
+                    # Mencatat metode pelunasan ke histori
+                    info_metode_final = (
+                        f"{metode_pelunasan} ({no_sumber_pelunasan})"
+                        if grand_total_checkout > 0
+                        else "Lunas Sejak Awal"
+                    )
+
                     st.session_state.histori_transaksi.append({
-                        "id": tamu["id"], 
-                        "nama": tamu["nama"], 
-                        "kamar": tamu["kamar"], 
+                        "id": tamu["id"],
+                        "nama": tamu["nama"],
+                        "kamar": tamu["kamar"],
                         "tipe": tamu["tipe"],
-                        "grand_total": tamu["total_biaya"] + tamu["food_charge"], 
+                        "grand_total": tamu["total_biaya"] + tamu["food_charge"],
                         "metode_pelunasan": info_metode_final,
                         "status": "✅ Selesai (Check-Out & Lunas)"
                     })
-                    
-                    st.session_state.reservasi_log.remove(tamu) # Hapus dari daftar tamu aktif
-                    st.success("Proses Pelunasan Kamar & Check-Out Berhasil! Kamar Anda sudah siap dipesan kembali.")
-                    st.rerun()
-        else:
-            st.error("Data reservasi tidak ditemukan. Pastikan informasi yang dimasukkan sudah benar.")
 
+                    st.session_state.reservasi_log.remove(tamu)
+                    st.success(
+                        "Pelunasan berhasil diproses dan check-out telah selesai. Terima kasih telah menginap di Denara Hotel."
+                    )
+
+                    st.rerun()
+            
 
 # --- 7. HISTORI & PEMBATALAN SAYA ---
 elif pilihan_menu == "📜 Histori & Pembatalan":
