@@ -529,6 +529,7 @@ elif pilihan_menu == "💳 Pembayaran Reservasi Hotel":
     metode = st.selectbox("Mau Bayar Lewat Mana?", ["Transfer BCA", "Mandiri Virtual Account", "GoPay", "OVO", "Dana"])
     
     # --- FITUR TAMBAHAN REKENING / NO E-WALLET ---
+    valid_nomor = False
     if "Transfer" in metode or "Account" in metode:
         no_sumber_bayar = st.text_input(
             f"Masukkan Nomor Rekening Bank Anda ({metode}):",
@@ -543,13 +544,9 @@ elif pilihan_menu == "💳 Pembayaran Reservasi Hotel":
             elif len(no_sumber_bayar) > 16:
                 st.error("Nomor rekening maksimal 16 digit.")
             else:
+                valid_nomor = True
                 st.success("Nomor rekening valid.")
-    else:
-        no_sumber_bayar = st.text_input(
-            f"Masukkan Nomor HP Akun {metode} Anda:",
-            placeholder="Contoh: 081234567890"
-        )
-        
+                
         if no_sumber_bayar:
             if not no_sumber_bayar.isdigit():
                 st.error("Nomor HP hanya boleh berisi angka.")
@@ -558,7 +555,10 @@ elif pilihan_menu == "💳 Pembayaran Reservasi Hotel":
             elif len(no_sumber_bayar) > 13:
                 st.error("Nomor HP maksimal 13 digit.")
             else:
+                valid_nomor = True
                 st.success("Nomor HP valid.")
+        
+        
     # ---------------------------------------------
 
     # Fitur andalan: Bisa milih bayar lunas langsung atau bayar setengah (DP 50%) dulu
@@ -600,24 +600,40 @@ elif pilihan_menu == "💳 Pembayaran Reservasi Hotel":
     # Tombol buat nge-deal pembayaran dan ngerubah status kamar jadi "Direservasi" (Kuning)
     if st.button("Konfirmasi Bayar & Ambil Kode Kamar ✔️", type="primary"):
         if not no_sumber_bayar:
-            st.error(f"Mohon isi Nomor Rekening atau Nomor HP {metode} Anda terlebih dahulu untuk validasi transaksi!")
+            st.error(f"Mohon isi Nomor Rekening atau Nomor HP {metode} Anda terlebih dahulu!")
+        elif not no_sumber_bayar.isdigit():
+            st.error("Nomor rekening / nomor HP hanya boleh berisi angka.")
+        elif len(no_sumber_bayar) < 10:
+            st.error("Nomor rekening / nomor HP minimal 10 digit.")
         else:
             st.session_state.reservasi_log.append({
-                "id": dt["id_invoice"], "nama": dt["nama"], "hp": dt["hp"], "email": dt["email"],
-                "kamar": dt["kamar"]["No Kamar"], "tipe": dt["tipe"], "check_in": dt["check_in"],
-                "check_out": dt["check_out"], "total_biaya": total_tagihan, "sudah_dibayar": jumlah_dibayar_sekarang,
-                "status_bayar": status_bayar, "metode": f"{metode} ({no_sumber_bayar})", "status": "🟨 Direservasi", "food_charge": 0
+                "id": dt["id_invoice"],
+                "nama": dt["nama"],
+                "hp": dt["hp"],
+                "email": dt["email"],
+                "kamar": dt["kamar"]["No Kamar"],
+                "tipe": dt["tipe"],
+                "check_in": dt["check_in"],
+                "check_out": dt["check_out"],
+                "total_biaya": total_tagihan,
+                "sudah_dibayar": jumlah_dibayar_sekarang,
+                "status_bayar": status_bayar,
+                "metode": f"{metode} ({no_sumber_bayar})",
+                "status": "🟨 Direservasi",
+                "food_charge": 0
             })
+            
             for kamar in st.session_state.kamar_data:
                 if kamar["No Kamar"] == dt["kamar"]["No Kamar"]:
                     kamar["Status"] = "🟨 Direservasi"
-            del st.session_state.proses_checkout # Hapus data temporary biar bersih
-            st.success("Pembayaran Berhasil Diterima! Kamar aman dipesan. Sisa tagihan (jika ada) akan dilunasi saat check-out.")
-            st.rerun()
-
-            # merefresh agar angka berubah (autoo update timer)
-            import time
-            time.sleep(1)
+                    
+            del st.session_state.proses_checkout
+            
+            st.success(
+                "Pembayaran berhasil diterima. Reservasi kamar telah dikonfirmasi. "
+                "Jika masih terdapat sisa tagihan, pelunasan dapat dilakukan saat check-out."
+            )
+            
             st.rerun()
                        
 # --- 6. CEK DETAIL & CHECK-OUT MANDIRI ---
