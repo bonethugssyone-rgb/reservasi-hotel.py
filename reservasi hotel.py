@@ -12,9 +12,9 @@ st.markdown("""
 [data-testid="stAppViewContainer"]{
     background: linear-gradient(
         135deg,
-        #F7FAFC,
-        #EEF7FF,
-        #E6F4FF
+        #FFFDF8,
+        #FFF8F0,
+        #FFF3E8
     );
 }
 
