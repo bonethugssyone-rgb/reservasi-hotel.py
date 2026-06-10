@@ -530,9 +530,36 @@ elif pilihan_menu == "💳 Pembayaran Reservasi Hotel":
     
     # --- FITUR TAMBAHAN REKENING / NO E-WALLET ---
     if "Transfer" in metode or "Account" in metode:
-        no_sumber_bayar = st.text_input(f"Masukkan Nomor Rekening Bank Anda ({metode}):", placeholder="Contoh: 8012345xxx")
+    no_sumber_bayar = st.text_input(
+        f"Masukkan Nomor Rekening Bank Anda ({metode}):",
+        placeholder="Contoh: 8012345678"
+    )
+
+    if no_sumber_bayar:
+        if not no_sumber_bayar.isdigit():
+            st.error("Nomor rekening hanya boleh berisi angka.")
+        elif len(no_sumber_bayar) < 8:
+            st.error("Nomor rekening minimal 8 digit.")
+        elif len(no_sumber_bayar) > 16:
+            st.error("Nomor rekening maksimal 16 digit.")
+        else:
+            st.success("Nomor rekening valid.")
+        
     else:
-        no_sumber_bayar = st.text_input(f"Masukkan Nomor HP Akun {metode} Anda:", placeholder="Contoh: 08123456xxx")
+    no_sumber_bayar = st.text_input(
+        f"Masukkan Nomor HP Akun {metode} Anda:",
+        placeholder="Contoh: 081234567890"
+    )
+
+    if no_sumber_bayar:
+        if not no_sumber_bayar.isdigit():
+            st.error("Nomor HP hanya boleh berisi angka.")
+        elif len(no_sumber_bayar) < 10:
+            st.error("Nomor HP minimal 10 digit.")
+        elif len(no_sumber_bayar) > 13:
+            st.error("Nomor HP maksimal 13 digit.")
+        else:
+            st.success("Nomor HP valid.")
     # ---------------------------------------------
 
     # Fitur andalan: Bisa milih bayar lunas langsung atau bayar setengah (DP 50%) dulu
