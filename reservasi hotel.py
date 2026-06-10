@@ -166,6 +166,11 @@ elif menu_utama == "🛟 Bantuan":
 
 # --- 1. DASHBOARD ---
 if pilihan_menu == "🏠 Dashboard":
+    kamar_kosong = len([
+    kamar
+    for kamar in st.session_state.kamar_data
+    if kamar["Status"] == "🟩 Tersedia"
+])
 
     st.markdown("""
     <div class="hero-banner">
