@@ -9,58 +9,51 @@ st.set_page_config(page_title="Denara Hotel", layout="wide", page_icon="🏨")
 # Settingan Mneggunakan CSS 
 # ==========================================
 
-# --- MOCK DATA (Untuk testing agar tidak error saat dijalankan secara mandiri) ---
-if "kamar_data" not in st.session_state:
-    st.session_state.kamar_data = [{"Status": "🟩 Tersedia"} for _ in range(5)]
-if "ulasan_log" not in st.session_state:
-    st.session_state.ulasan_log = [{"nama": "Budi", "komentar": "Pelayanan sangat ramah dan kamar bersih!"}]
+.hero-banner{
+    background: linear-gradient(rgba(0,0,0,0.35), rgba(0,0,0,0.35)),
+    url('https://images.unsplash.com/photo-1566073771259-6a8506099945');
+    background-size: cover;
+    background-position: center;
+    height: 320px;
+    border-radius: 20px;
+    padding: 40px;
+    color: white;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    margin-bottom:25px;
+}
 
-# Menambahkan menu pilihan (Ganti dengan sistem navigasi milikmu jika ada)
-pilihan_menu = "🏠 Dashboard" 
-# ---------------------------------------------------------------------------------
+.hero-title{
+    font-size:42px;
+    font-weight:bold;
+}
 
-# 3. Logika Tampilan Dashboard
-if pilihan_menu == "🏠 Dashboard":
-    st.markdown('<div class="title">🏠 Selamat Datang di Denara Hotel</div>', unsafe_allow_html=True)
-    st.markdown('<div class="subtitle">Sistem Manajemen & Reservasi Hotel Eksklusif Berbasis Digital</div>', unsafe_allow_html=True)
-    
-    # Grid Layout Utama Dashboard atas: Gambar Hero + Statistik Ringkas
-    dash_col1, dash_col2 = st.columns([2, 1])
-    
-    with dash_col1:
-        # Menampilkan gambar estetik interior kamar / hotel
-        st.image("https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=1200&q=80", 
-                 caption="Denara Luxury Stay Experience", use_container_width=True)
-    
-    with dash_col2:
-        st.markdown('<div class="card" style="height: 100%;">', unsafe_allow_html=True)
-        st.markdown("### Status Ketersediaan")
-        kamar_kosong = len([k for k in st.session_state.kamar_data if k["Status"] == "🟩 Tersedia"])
-        st.metric("Kamar Kosong Saat Ini", f"{kamar_kosong} Unit")
-        st.caption("Lantai 1 sampai Lantai 4 VIP")
-        
-        st.markdown("""
-        <div class="promo" style="margin-top: 20px;">
-        <h4>📢 Promo Bulan Ini</h4>
-        <p>Gunakan Kode Kupon: <b>DISC10%</b> untuk mendapatkan potongan langsung 10%!</p>
-        </div>
-        """, unsafe_allow_html=True)
-        st.markdown('</div>', unsafe_allow_html=True)
+.hero-subtitle{
+    font-size:18px;
+    opacity:0.95;
+}
 
-    # Layout Dashboard Bawah: Kamar Terlaris & Review Tamu Terbaru
-    col1, col2 = st.columns(2)
-    with col1:
-        st.markdown('<div class="card"><h3>👑 Tipe Kamar Terlaris</h3>', unsafe_allow_html=True)
-        st.write("*Suite Room (Lantai 4 VIP)*")
-        st.caption("Fasilitas Unggulan: Private Jacuzzi, Kolam Renang Pribadi & Layanan Butler 24 Jam")
-        st.progress(0.95)
-        st.markdown('</div>', unsafe_allow_html=True)
-        
-    with col2:
-        st.markdown('<div class="card"><h3>⭐ Review & Ulasan Terbaru</h3>', unsafe_allow_html=True)
-        for u in st.session_state.ulasan_log[-2:]:
-            st.markdown(f'<div class="review-box"><b>{u["nama"]}</b> (⭐ {u["rating"]})<br><small>"{u["komentar"]}"</small></div>', unsafe_allow_html=True)
-        st.markdown('</div>', unsafe_allow_html=True)
+.stat-card{
+    background:white;
+    padding:20px;
+    border-radius:15px;
+    text-align:center;
+    box-shadow:0px 5px 15px rgba(0,0,0,0.08);
+}
+
+.hotel-gallery img{
+    border-radius:15px;
+    margin-bottom:10px;
+}
+
+.welcome-card{
+    background:linear-gradient(135deg,#ff4d8d,#ff8fb1);
+    color:white;
+    padding:20px;
+    border-radius:15px;
+    margin-bottom:20px;
+}
 # ==========================================
 # DATA MASTER & KONDISI AWAL DATABASE
 # ==========================================
@@ -162,156 +155,109 @@ elif menu_utama == "🛟 Bantuan":
 # --- 1. DASHBOARD ---
 if pilihan_menu == "🏠 Dashboard":
 
-    # Hero section dengan gambar aesthetic & overlay pink smooth
     st.markdown("""
-    <div class="hero">
-        <div class="hero-title">DENARA HOTEL</div>
-        <div class="hero-subtitle">Stay Cozy, Live Lovely</div>
-        <div class="hero-line"></div>
-        <div class="hero-desc">
-            Tempat pas buat kamu yang pengen rehat sejenak. Nikmati kamar super nyaman, 
-            desain estetik, dan pelayanan ramah yang bikin kamu merasa kayak di rumah sendiri.
+    <div class="hero-banner">
+        <div class="hero-title">🏨 DENARA HOTEL</div>
+        <div class="hero-subtitle">
+            Nikmati pengalaman menginap mewah dengan pelayanan terbaik,
+            kamar eksklusif, dan fasilitas premium.
         </div>
-        <div class="hero-button">💖 Pilihan Terfavorit Tahun Ini</div>
     </div>
     """, unsafe_allow_html=True)
 
-    st.markdown("<br>", unsafe_allow_html=True)
+    col1, col2, col3 = st.columns(3)
 
-    # Hitung kamar tersedia secara real-time
-    kamar_kosong = len([k for k in st.session_state.kamar_data if k["Status"] == "🟩 Tersedia"])
-
-    # Stat Cards (Warna teks disesuaikan pink/abu netral)
-    col1, col2, col3, col4 = st.columns(4)
     with col1:
-        st.markdown(f'<div class="stat-card"><h1>🔑</h1><h2>{kamar_kosong} Kamar</h2><p>Siap Kamu Pesan</p></div>', unsafe_allow_html=True)
-    with col2:
-        st.markdown('<div class="stat-card"><h1>⭐</h1><h2>4.9 / 5.0</h2><p>Rating Kepuasan Tamu</p></div>', unsafe_allow_html=True)
-    with col3:
-        st.markdown('<div class="stat-card"><h1>🌸</h1><h2>12.500+</h2><p>Tamu Happy Menginap</p></div>', unsafe_allow_html=True)
-    with col4:
-        st.markdown('<div class="stat-card"><h1>🏆</h1><h2>Top Service</h2><p>Denara Hospitality Award</p></div>', unsafe_allow_html=True)
-
-    st.markdown("<br>", unsafe_allow_html=True)
-    st.subheader("✨ Fasilitas Seru Buat Kamu")
-
-    # Facility Cards (Icon disesuaikan agar lebih natural)
-    f1, f2, f3, f4 = st.columns(4)
-    with f1:
-        st.markdown('<div class="facility-card">🏊‍♂️<br><br><b>Infinity Pool</b></div>', unsafe_allow_html=True)
-    with f2:
-        st.markdown('<div class="facility-card">🍰<br><br><b>Cafe & Restaurant</b></div>', unsafe_allow_html=True)
-    with f3:
-        st.markdown('<div class="facility-card">💆‍♀️<br><br><b>Spa & Relaksasi</b></div>', unsafe_allow_html=True)
-    with f4:
-        st.markdown('<div class="facility-card">🚲<br><br><b>Free Scooter Rental</b></div>', unsafe_allow_html=True)
-
-    st.markdown("<br>", unsafe_allow_html=True)
-
-    # Promo Box (Bukan kuning/oranye lagi, tapi dikembalikan ke Pink khas dashboard)
-    st.markdown("""
-    <div class="luxury-box">
-        <h2>📢 Info Promo Buat Kamu</h2>
-        <h3>Diskon Potongan 10% Spesial Weekend!</h3>
-        <p>Jangan lupa masukin kode voucher <b>DISC10%</b> pas kamu di menu pembayaran nanti ya.</p>
-    </div>
-    """, unsafe_allow_html=True)
-
-    st.markdown("<br>", unsafe_allow_html=True)
-
-    # Highlight Room (Foto kamar asli dari Unsplash, no-AI-look, rapi dan estetik)
-    colA, colB = st.columns([1.6, 1])
-    with colA:
-        st.image("https://images.unsplash.com/photo-1566665797739-1674de7a421a?auto=format&fit=crop&w=800&q=80", use_container_width=True)
-    with colB:
-        st.markdown("""
-        <div class="card" style="height: 100%; min-height: 290px;">
-            <h3 style="color:#E91E63; margin-top:0;">👑 Suite Room (Lantai 4 VIP)</h3>
-            <p style="color:#555; font-size:15px;">Tipe kamar paling laris dan jadi rebutan. Udah dapet Private Jacuzzi, Premium Mini Bar, dan layanan Butler 24 jam penuh.</p>
-            <span style="font-size: 14px; color:#777;">Mulai dari:</span>
-            <h2 style="color:#E91E63; margin: 0 0 15px 0; font-size:28px;">Rp 9.500.000 <small style="font-size:14px; font-weight:normal; color:#777;">/ malam</small></h2>
-            <span style="color:#FF4D8D;">⭐⭐⭐⭐⭐</span> <small style="color:#777;">(Pilihan Utama Eksekutif)</small>
-        </div>
-        """, unsafe_allow_html=True)
-
-    st.markdown("<br>", unsafe_allow_html=True)
-    st.subheader("💬 Kata Tamu Yang Udah Nginep")
-
-    # Review Logs (Mengambil data dinamis dari ulasan_log)
-    for u in st.session_state.ulasan_log[-3:]:
         st.markdown(f"""
-        <div class="review-box">
-            <span style="color:#FF4D8D;">⭐⭐⭐⭐⭐</span><br>
-            <b>{u['nama']}</b><br>
-            <small style="color:#555; font-size:14px;">"{u['komentar']}"</small>
+        <div class="stat-card">
+            <h2>{kamar_kosong}</h2>
+            <p>Kamar Tersedia</p>
         </div>
         """, unsafe_allow_html=True)
 
-    # Hitung kamar tersedia
-    kamar_kosong = len([k for k in st.session_state.kamar_data if k["Status"] == "🟩 Tersedia"])
-
-    # Stat Cards
-    col1, col2, col3, col4 = st.columns(4)
-    with col1:
-        st.markdown(f'<div class="stat-card"><h1>🏨</h1><h2>{kamar_kosong}</h2><p>Kamar Tersedia</p></div>', unsafe_allow_html=True)
     with col2:
-        st.markdown('<div class="stat-card"><h1>⭐</h1><h2>4.9/5</h2><p>Rating Hotel</p></div>', unsafe_allow_html=True)
+        st.markdown("""
+        <div class="stat-card">
+            <h2>4</h2>
+            <p>Tipe Kamar</p>
+        </div>
+        """, unsafe_allow_html=True)
+
     with col3:
-        st.markdown('<div class="stat-card"><h1>👥</h1><h2>12.500+</h2><p>Tamu Menginap</p></div>', unsafe_allow_html=True)
-    with col4:
-        st.markdown('<div class="stat-card"><h1>🏆</h1><h2>Best Hotel</h2><p>2026 Award</p></div>', unsafe_allow_html=True)
-
-    st.markdown("<br>", unsafe_allow_html=True)
-    st.subheader("✨ Fasilitas Premium")
-
-    # Facility Cards
-    f1, f2, f3, f4 = st.columns(4)
-    with f1:
-        st.markdown('<div class="facility-card">🏊<br><br><b>Infinity Pool</b></div>', unsafe_allow_html=True)
-    with f2:
-        st.markdown('<div class="facility-card">🍽️<br><br><b>Restaurant</b></div>', unsafe_allow_html=True)
-    with f3:
-        st.markdown('<div class="facility-card">💆<br><br><b>Spa & Wellness</b></div>', unsafe_allow_html=True)
-    with f4:
-        st.markdown('<div class="facility-card">🚗<br><br><b>Free Parking</b></div>', unsafe_allow_html=True)
+        st.markdown("""
+        <div class="stat-card">
+            <h2>24 Jam</h2>
+            <p>Layanan Hotel</p>
+        </div>
+        """, unsafe_allow_html=True)
 
     st.markdown("<br>", unsafe_allow_html=True)
 
-    # Promo Box
     st.markdown("""
-    <div class="luxury-box">
-        <h2>🎁 Promo Spesial Bulan Ini</h2>
-        <h3>Diskon 10% Semua Tipe Kamar</h3>
-        <p>Gunakan kode voucher <b>DISC10%</b></p>
+    <div class="welcome-card">
+        <h3>✨ Promo Spesial Bulan Ini</h3>
+        <p>
+        Gunakan voucher <b>DISC10%</b> dan dapatkan potongan hingga 10%
+        untuk seluruh tipe kamar.
+        </p>
     </div>
     """, unsafe_allow_html=True)
 
-    st.markdown("<br>", unsafe_allow_html=True)
+    st.subheader("📸 Galeri Hotel")
 
-    # Highlight Room
-    colA, colB = st.columns([2, 1])
-    with colA:
-        st.image("https://images.unsplash.com/photo-1578683010236-d716f9a3f461", use_container_width=True)
-    with colB:
+    col1, col2, col3 = st.columns(3)
+
+    with col1:
+        st.image(
+            "https://images.unsplash.com/photo-1551882547-ff40c63fe5fa",
+            use_container_width=True
+        )
+
+    with col2:
+        st.image(
+            "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b",
+            use_container_width=True
+        )
+
+    with col3:
+        st.image(
+            "https://images.unsplash.com/photo-1578683010236-d716f9a3f461",
+            use_container_width=True
+        )
+
+    st.markdown("---")
+
+    col1, col2 = st.columns(2)
+
+    with col1:
         st.markdown("""
         <div class="card">
-            <h3>👑 Suite Room VIP</h3>
-            <p>Kamar terbaik dengan Private Jacuzzi, Butler Service dan Private Pool.</p>
-            <h2 style="color:#E91E63; margin: 10px 0;">Rp 9.500.000</h2>
-            ⭐⭐⭐⭐⭐
+            <h3>👑 Kamar Favorit Tamu</h3>
+            <h4>Suite Room</h4>
+            <p>
+            Dilengkapi Private Jacuzzi, Living Room,
+            Butler Service, dan Private Pool.
+            </p>
         </div>
         """, unsafe_allow_html=True)
 
-    st.markdown("<br>", unsafe_allow_html=True)
-    st.subheader("💬 Ulasan Tamu")
+    with col2:
+        st.markdown("""
+        <div class="card">
+            <h3>⭐ Rating Hotel</h3>
+            <h1>4.9 / 5</h1>
+            <p>Berdasarkan ulasan tamu yang menginap.</p>
+        </div>
+        """, unsafe_allow_html=True)
 
-    # Review Logs
+    st.subheader("💬 Ulasan Terbaru")
+
     for u in st.session_state.ulasan_log[-3:]:
         st.markdown(f"""
         <div class="review-box">
-            ⭐⭐⭐⭐⭐<br>
             <b>{u['nama']}</b><br>
-            "{u['komentar']}"
+            ⭐ {u['rating']} / 5<br>
+            <small>{u['komentar']}</small>
         </div>
         """, unsafe_allow_html=True)
 
