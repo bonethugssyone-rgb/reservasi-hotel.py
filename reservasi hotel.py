@@ -472,7 +472,7 @@ elif pilihan_menu == "🗺️ Denah Kamar":
                 if detail["Status"] == "🟩 Tersedia": 
                     st.success(f"🚪 {detail['No Kamar']}\n(Masih tersedia)")
                 else: 
-                    st.error(f"🟨 {detail['No Kamar']}\n("Kamar tidak tersedia.")
+                    st.error(f"🟨 {detail['No Kamar']}\nKamar tidak tersedia.")
 
 # --- 5. PEMBAYARAN TIKET RESERVASI ---
 elif pilihan_menu == "💳 Pembayaran Reservasi Hotel":
