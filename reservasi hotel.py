@@ -304,11 +304,17 @@ elif pilihan_menu == "📝 Reservasi Baru":
         with st.expander("🔍 Cek Ketersediaan Kamar Terkini"):
             st.write("Daftar status kamar saat ini:")
             for k in st.session_state.kamar_data:
-                # Menyesuaikan tampilan status sesuai permintaan Anda
-                display_status = "Tersedia" if "Tersedia" in k["Status"] else "Booking"
+                no_kamar = k.get("No Kamar", "-")
+                tipe_kamar = k.get("Tipe Kamar", "-")
+                status = k.get("Status", "Tidak Diketahui")
+                
+                display_status = "Tersedia" if "Tersedia" in status else "Booking"
                 color = "green" if display_status == "Tersedia" else "red"
-                st.markdown(f"- Kamar **{k['No Kamar']}** ({k['Tipe Kamar']}): :{'green' if display_status == 'Tersedia' else 'red'}[**{display_status}**]")
-
+                
+                st.markdown(
+                    f"- Kamar **{no_kamar}** ({tipe_kamar}): "
+                    f":{color}[**{display_status}**]"
+                )
         st.markdown("---")
         st.subheader("🤖 Saran Kamar Dari Bot")
         saran = "Standard Room" if jml_tamu <= 2 else ("Superior Room" if jml_tamu <= 4 else "Suite Room")
