@@ -470,7 +470,7 @@ elif pilihan_menu == "🗺️ Denah Kamar":
             with cols[idx % 6]:
                 # Warnanya otomatis ijo kalau kosong, merah kalau udah di-booking 
                 if detail["Status"] == "🟩 Tersedia": 
-                    st.success(f"🚪 {detail['No Kamar']}\n(Masih tersedia)")
+                    st.success(f"🚪 {detail['No Kamar']}\n tersedia. ")
                 else: 
                     st.error(f"🟨 {detail['No Kamar']}\nKamar tidak tersedia.")
 
