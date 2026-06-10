@@ -9,16 +9,12 @@ st.markdown("""
 <style>
 
 /* Background utama */
-[data-testid="stSidebar"]{
-    background-color:#E7C3D1;
-}
-
 [data-testid="stAppViewContainer"]{
     background: linear-gradient(
         135deg,
-        #F7E4EB,
-        #F2D7E2,
-        #EBC9D7
+        #FFFDF8,
+        #FFF8F0,
+        #FFF3E8
     );
 }
 
