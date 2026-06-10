@@ -13,8 +13,8 @@ st.markdown("""
     background: linear-gradient(
         135deg,
         #FFD6E5,
-        #E0F2FE,
-        #F3E8FF
+        #F3E8FF,
+        #E0F2FE
     );
 }
 
