@@ -8,9 +8,17 @@ st.set_page_config(page_title="Denara Hotel", layout="wide", page_icon="🏨")
 # ==========================================
 # Settingan Mneggunakan CSS 
 # ==========================================
+# ==========================================
+# SETTINGAN CSS TAMPILAN
+# ==========================================
+st.markdown("""
+<style>
 
 .hero-banner{
-    background: linear-gradient(rgba(0,0,0,0.35), rgba(0,0,0,0.35)),
+    background: linear-gradient(
+        rgba(0,0,0,0.35),
+        rgba(0,0,0,0.35)
+    ),
     url('https://images.unsplash.com/photo-1566073771259-6a8506099945');
     background-size: cover;
     background-position: center;
@@ -18,42 +26,46 @@ st.set_page_config(page_title="Denara Hotel", layout="wide", page_icon="🏨")
     border-radius: 20px;
     padding: 40px;
     color: white;
-    display:flex;
-    flex-direction:column;
-    justify-content:center;
-    margin-bottom:25px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    margin-bottom: 25px;
 }
 
 .hero-title{
-    font-size:42px;
-    font-weight:bold;
+    font-size: 42px;
+    font-weight: bold;
 }
 
 .hero-subtitle{
-    font-size:18px;
-    opacity:0.95;
+    font-size: 18px;
+    opacity: 0.95;
 }
 
 .stat-card{
-    background:white;
-    padding:20px;
-    border-radius:15px;
-    text-align:center;
-    box-shadow:0px 5px 15px rgba(0,0,0,0.08);
+    background: white;
+    padding: 20px;
+    border-radius: 15px;
+    text-align: center;
+    box-shadow: 0px 5px 15px rgba(0,0,0,0.08);
 }
 
 .hotel-gallery img{
-    border-radius:15px;
-    margin-bottom:10px;
+    border-radius: 15px;
+    margin-bottom: 10px;
 }
 
 .welcome-card{
-    background:linear-gradient(135deg,#ff4d8d,#ff8fb1);
-    color:white;
-    padding:20px;
-    border-radius:15px;
-    margin-bottom:20px;
+    background: linear-gradient(135deg,#ff4d8d,#ff8fb1);
+    color: white;
+    padding: 20px;
+    border-radius: 15px;
+    margin-bottom: 20px;
 }
+
+</style>
+""", unsafe_allow_html=True)
+
 # ==========================================
 # DATA MASTER & KONDISI AWAL DATABASE
 # ==========================================
