@@ -469,10 +469,10 @@ elif pilihan_menu == "🗺️ Denah Kamar":
         for idx, detail in enumerate(kamar_lantai):
             with cols[idx % 6]:
                 # Warnanya otomatis ijo kalau kosong, merah kalau udah di-booking 
-                if detail["Status"] == "🟩 Tersedia": 
-                    st.success(f"🚪 {detail['No Kamar']}\n tersedia. ")
-                else: 
-                    st.error(f"🟨 {detail['No Kamar']}\nKamar tidak tersedia.")
+                if detail["Status"] == "🟩 Tersedia":
+                    st.success(f"Kamar {detail['No Kamar']} | Tersedia")
+                else:
+                    st.error(f"Kamar {detail['No Kamar']} | Sudah Dibooking")
 
 # --- 5. PEMBAYARAN TIKET RESERVASI ---
 elif pilihan_menu == "💳 Pembayaran Reservasi Hotel":
