@@ -558,7 +558,7 @@ elif pilihan_menu == "💳 Pembayaran Reservasi Hotel":
             elif len(no_sumber_bayar) > 13:
                 st.error("Nomor HP maksimal 13 digit.")
             else:
-            st.success("Nomor HP valid.")
+                st.success("Nomor HP valid.")
     # ---------------------------------------------
 
     # Fitur andalan: Bisa milih bayar lunas langsung atau bayar setengah (DP 50%) dulu
