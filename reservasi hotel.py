@@ -8,57 +8,84 @@ from datetime import datetime, date
 st.markdown("""
 <style>
 
-.hero-banner{
-    background: linear-gradient(
-        rgba(0,0,0,0.35),
-        rgba(0,0,0,0.35)
-    ),
-    url('https://images.unsplash.com/photo-1566073771259-6a8506099945');
-    background-size: cover;
-    background-position: center;
-    height: 320px;
-    border-radius: 20px;
-    padding: 40px;
-    color: white;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    margin-bottom: 25px;
+/* Background utama */
+.stApp{
+    background-color:#FFF5F8;
 }
 
-.hero-title{
-    font-size: 42px;
-    font-weight: bold;
+/* Sidebar */
+section[data-testid="stSidebar"]{
+    background-color:#FFD6E5;
 }
 
-.hero-subtitle{
-    font-size: 18px;
-    opacity: 0.95;
+/* Judul dashboard */
+.dashboard-title{
+    text-align:center;
+    color:#E91E63;
+    font-size:40px;
+    font-weight:bold;
 }
 
+.dashboard-subtitle{
+    text-align:center;
+    color:#666;
+    margin-bottom:20px;
+}
+
+/* Card statistik */
 .stat-card{
-    background: white;
-    padding: 20px;
-    border-radius: 15px;
-    text-align: center;
-    box-shadow: 0px 5px 15px rgba(0,0,0,0.08);
+    padding:20px;
+    border-radius:15px;
+    text-align:center;
+    color:#333;
+    font-weight:bold;
 }
 
-.hotel-gallery img{
-    border-radius: 15px;
-    margin-bottom: 10px;
+.card-pink{
+    background:#FFD6E8;
 }
 
+.card-purple{
+    background:#E6D6FF;
+}
+
+.card-blue{
+    background:#D6F0FF;
+}
+
+.card-yellow{
+    background:#FFF3BF;
+}
+
+/* Card umum */
+.card{
+    background:white;
+    padding:20px;
+    border-radius:15px;
+    border-left:5px solid #E91E63;
+    margin-bottom:15px;
+}
+
+/* Promo */
 .welcome-card{
-    background: linear-gradient(135deg,#ff4d8d,#ff8fb1);
-    color: white;
-    padding: 20px;
-    border-radius: 15px;
-    margin-bottom: 20px;
+    background:#E91E63;
+    color:white;
+    padding:20px;
+    border-radius:15px;
+}
+
+/* Review */
+.review-box{
+    background:white;
+    padding:15px;
+    border-radius:10px;
+    margin-bottom:10px;
+    border-left:5px solid #FF69B4;
 }
 
 </style>
 """, unsafe_allow_html=True)
+
 # ==========================================
 # DATA MASTER & KONDISI AWAL DATABASE
 # ==========================================
@@ -163,27 +190,29 @@ elif menu_utama == "🛟 Bantuan":
 
 # --- 1. DASHBOARD ---
 if pilihan_menu == "🏠 Dashboard":
+
     kamar_kosong = len([
-    kamar
-    for kamar in st.session_state.kamar_data
-    if kamar["Status"] == "🟩 Tersedia"
-])
+        kamar
+        for kamar in st.session_state.kamar_data
+        if kamar.get("Status") == "🟩 Tersedia"
+    ])
 
     st.markdown("""
-    <div class="hero-banner">
-        <div class="hero-title">🏨 DENARA HOTEL</div>
-        <div class="hero-subtitle">
-            Nikmati pengalaman menginap mewah dengan pelayanan terbaik,
-            kamar eksklusif, dan fasilitas premium.
-        </div>
+    <div class="dashboard-title">
+        🏨 DENARA HOTEL
+    </div>
+
+    <div class="dashboard-subtitle">
+        Sistem Reservasi dan Manajemen Hotel
     </div>
     """, unsafe_allow_html=True)
 
-    col1, col2, col3 = st.columns(3)
+    # Statistik
+    col1, col2, col3, col4 = st.columns(4)
 
     with col1:
         st.markdown(f"""
-        <div class="stat-card">
+        <div class="stat-card card-pink">
             <h2>{kamar_kosong}</h2>
             <p>Kamar Tersedia</p>
         </div>
@@ -191,7 +220,7 @@ if pilihan_menu == "🏠 Dashboard":
 
     with col2:
         st.markdown("""
-        <div class="stat-card">
+        <div class="stat-card card-purple">
             <h2>4</h2>
             <p>Tipe Kamar</p>
         </div>
@@ -199,81 +228,104 @@ if pilihan_menu == "🏠 Dashboard":
 
     with col3:
         st.markdown("""
-        <div class="stat-card">
+        <div class="stat-card card-blue">
             <h2>24 Jam</h2>
-            <p>Layanan Hotel</p>
+            <p>Layanan</p>
         </div>
         """, unsafe_allow_html=True)
 
-    st.markdown("<br>", unsafe_allow_html=True)
+    with col4:
+        st.markdown("""
+        <div class="stat-card card-yellow">
+            <h2>4.9</h2>
+            <p>Rating</p>
+        </div>
+        """, unsafe_allow_html=True)
 
+    st.write("")
+
+    # Promo
     st.markdown("""
     <div class="welcome-card">
-        <h3>✨ Promo Spesial Bulan Ini</h3>
-        <p>
-        Gunakan voucher <b>DISC10%</b> dan dapatkan potongan hingga 10%
-        untuk seluruh tipe kamar.
-        </p>
+        <h3>🎉 Promo Bulan Ini</h3>
+        Gunakan Voucher <b>DISC10%</b> untuk mendapatkan diskon 10%.
     </div>
     """, unsafe_allow_html=True)
 
-    st.subheader("📸 Galeri Hotel")
+    st.write("")
 
-    col1, col2, col3 = st.columns(3)
+    # Informasi Hotel
+    st.subheader("📋 Informasi Hotel")
 
-    with col1:
-        st.image(
-            "https://images.unsplash.com/photo-1551882547-ff40c63fe5fa",
-            use_container_width=True
-        )
+    info_hotel = {
+        "Kategori":[
+            "Jumlah Kamar",
+            "Tipe Kamar",
+            "Check In",
+            "Check Out",
+            "Layanan",
+            "Rating"
+        ],
+        "Informasi":[
+            "15 Kamar",
+            "Standard, Superior, Deluxe, Suite",
+            "14:00 WIB",
+            "12:00 WIB",
+            "24 Jam",
+            "⭐ 4.9 / 5"
+        ]
+    }
 
-    with col2:
-        st.image(
-            "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b",
-            use_container_width=True
-        )
+    st.table(info_hotel)
 
-    with col3:
-        st.image(
-            "https://images.unsplash.com/photo-1578683010236-d716f9a3f461",
-            use_container_width=True
-        )
+    st.write("")
 
-    st.markdown("---")
+    # Ringkasan fasilitas
+    st.subheader("🏨 Fasilitas Hotel")
 
-    col1, col2 = st.columns(2)
+    fasilitas = {
+        "Fasilitas":[
+            "WiFi",
+            "Kolam Renang",
+            "Restoran",
+            "Gym",
+            "Spa"
+        ],
+        "Tersedia":[
+            "✅",
+            "✅",
+            "✅",
+            "✅",
+            "✅"
+        ]
+    }
 
-    with col1:
-        st.markdown("""
-        <div class="card">
-            <h3>👑 Kamar Favorit Tamu</h3>
-            <h4>Suite Room</h4>
-            <p>
-            Dilengkapi Private Jacuzzi, Living Room,
-            Butler Service, dan Private Pool.
-            </p>
-        </div>
-        """, unsafe_allow_html=True)
+    st.dataframe(fasilitas, use_container_width=True)
 
-    with col2:
-        st.markdown("""
-        <div class="card">
-            <h3>⭐ Rating Hotel</h3>
-            <h1>4.9 / 5</h1>
-            <p>Berdasarkan ulasan tamu yang menginap.</p>
-        </div>
-        """, unsafe_allow_html=True)
+    st.write("")
 
+    # Ulasan
     st.subheader("💬 Ulasan Terbaru")
 
-    for u in st.session_state.ulasan_log[-3:]:
-        st.markdown(f"""
-        <div class="review-box">
-            <b>{u['nama']}</b><br>
-            ⭐ {u['rating']} / 5<br>
-            <small>{u['komentar']}</small>
-        </div>
-        """, unsafe_allow_html=True)
+    if len(st.session_state.ulasan_log) > 0:
+
+        for u in st.session_state.ulasan_log[-3:]:
+
+            nama = u.get("nama","Guest")
+            rating = u.get("rating",5)
+            komentar = u.get("komentar","Tidak ada komentar")
+
+            st.markdown(f"""
+            <div class="review-box">
+                <b>{nama}</b><br>
+                ⭐ {rating}/5<br>
+                {komentar}
+            </div>
+            """, unsafe_allow_html=True)
+
+    else:
+        st.info("Belum ada ulasan.")
+
 # -- MENU 2. Reservasi Baru --
 elif pilihan_menu == "📝 Reservasi Baru":
     st.title("📝 Registrasi Menginap (Reservasi Baru)")
