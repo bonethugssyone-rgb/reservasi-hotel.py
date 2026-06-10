@@ -2,12 +2,6 @@ import streamlit as st
 import pandas as pd
 from datetime import datetime, date 
 
-# Seting awal tampilan web hotelnya biar dapet icon dan nama di tab browser
-st.set_page_config(page_title="Denara Hotel", layout="wide", page_icon="🏨")
-
-# ==========================================
-# Settingan Mneggunakan CSS 
-# ==========================================
 # ==========================================
 # SETTINGAN CSS TAMPILAN
 # ==========================================
@@ -65,7 +59,6 @@ st.markdown("""
 
 </style>
 """, unsafe_allow_html=True)
-
 # ==========================================
 # DATA MASTER & KONDISI AWAL DATABASE
 # ==========================================
@@ -88,10 +81,14 @@ FASILITAS_KAMAR = {
 # Menu makanan buat room service beserta harganya yang ramah kantong
 MENU_MAKANAN = {
     "Nasi Goreng Kampung": 35000, 
-    "Mie Goreng Cabe Ijo": 30000, 
+    "Ayam Goreng Sambal Matah": 30000, 
     "Ayam Goreng Serundeng": 40000, 
     "Es Teh Manis Premium": 12000, 
-    "Kopi Susu Aren": 20000
+    "Kopi Susu Aren": 20000,
+    "Kwetiaw Goreng": 20000,
+    "Indomie Goreng + telur": 19000,
+    "Butterscotch Latte": 22000,
+    "Nasi Ayam Geprek": 23000
 }
 
 # Tempat nyimpen status kamar biar datanya gak ilang pas aplikasinya di-refresh
@@ -153,7 +150,7 @@ if menu_utama == "🏠 Dashboard": pilihan_menu = "🏠 Dashboard"
 elif menu_utama == "🏨 Manajemen Kamar":
     pilihan_menu = st.sidebar.radio("Sub-Menu Kamar", ["📝 Reservasi Baru", "🏨 Katalog Kamar", "🗺️ Denah Kamar"])
 elif menu_utama == "💳 Area Transaksi Tamu":
-    pilihan_menu = st.sidebar.radio("Sub-Menu Transaksi", ["💳 Pembayaran Tiket", "🔍 Cek Detail & Check-Out", "📜 Histori & Pembatalan"])
+    pilihan_menu = st.sidebar.radio("Sub-Menu Transaksi", ["💳 Pembayaran Reservasi Hotel", "🔍 Cek Detail & Check-Out", "📜 Histori & Pembatalan"])
 elif menu_utama == "🍽️ Room Service":
     pilihan_menu = st.sidebar.radio("Sub-Menu Room Service", ["🍽️ Pesan Makanan", "💳 Bayar Room Service"])
 elif menu_utama == "⭐ Penilaian Hotel": pilihan_menu = "⭐ Ulasan Kepuasan"
@@ -277,7 +274,6 @@ if pilihan_menu == "🏠 Dashboard":
             <small>{u['komentar']}</small>
         </div>
         """, unsafe_allow_html=True)
-
 # -- MENU 2. Reservasi Baru --
 elif pilihan_menu == "📝 Reservasi Baru":
     st.title("📝 Registrasi Menginap (Reservasi Baru)")
@@ -288,9 +284,26 @@ elif pilihan_menu == "📝 Reservasi Baru":
         nama = st.text_input("Nama Lengkap (Sesuai KTP)")
         hp = st.text_input("Nomor WhatsApp Aktif", value="+62 ")
         email = st.text_input("Alamat Email", value="@gmail.com")
+        # pilih tipe kamar
         pilihan_tipe = st.selectbox("Mau Kamar Tipe Apa?", list(TARIF_KAMAR.keys()))
+
+        # memfilter kamar : hanya mengambil kamar yang sesuai tipe
+        kamar_sesuai_tipe = [k for k in st.session_state.kamar_data if k["Tipe Kamar"] == pilihan_tipe]
         
+        #pilihan no kamar (menampilkan no kamar)
+        pilihan_no_kamar = st.selectbox("Pilih Nomor Kamar:", [k['No Kamar'] for k in kamar_sesuai_tipe])
+
+        #ambil detail kamar terpilih
+        kamar_terpilih = next(k for k in kamar_sesuai_tipe if k['No Kamar'] == pilihan_no_kamar)
+
+        # cek status kamar secara real time
+        if "Tersedia" in kamar_terpilih["Status"]:
+            st.success("Status: Kamar ini tersedia untuk dipesan.")
+        else:
+            st.error("Status: Mohon maaf, kamar ini sudah dibooking.")
+            kamar_terpilih = None # Kunci agar tidak bisa lanjut ke proses selanjutnya
         st.markdown("**Fasilitas Yang Bakal Kamu Dapet:**")
+        
         for fas in FASILITAS_KAMAR[pilihan_tipe]:
             st.markdown(f'<span class="facility-tag">✔️ {fas}</span>', unsafe_allow_html=True)
             
@@ -304,31 +317,19 @@ elif pilihan_menu == "📝 Reservasi Baru":
         with st.expander("🔍 Cek Ketersediaan Kamar Terkini"):
             st.write("Daftar status kamar saat ini:")
             for k in st.session_state.kamar_data:
-                no_kamar = k.get("No Kamar", "-")
-                tipe_kamar = k.get("Tipe Kamar", "-")
-                status = k.get("Status", "Tidak Diketahui")
-                
-                display_status = "Tersedia" if "Tersedia" in status else "Booking"
+                # Menyesuaikan tampilan status sesuai permintaan Anda
+                display_status = "Tersedia" if "Tersedia" in k["Status"] else "Booking"
                 color = "green" if display_status == "Tersedia" else "red"
-                
-                st.markdown(
-                    f"- Kamar **{no_kamar}** ({tipe_kamar}): "
-                    f":{color}[**{display_status}**]"
-                )
+                st.markdown(f"- Kamar **{k['No Kamar']}** ({k['Tipe Kamar']}): :{'green' if display_status == 'Tersedia' else 'red'}[**{display_status}**]")
+
         st.markdown("---")
         st.subheader("🤖 Saran Kamar Dari Bot")
-        saran = "Standard Room" if jml_tamu <= 2 else ("Superior Room" if jml_tamu <= 4 else "Suite Room")
+        if jml_tamu <= 2: saran = "Standard Room"
+        elif jml_tamu <= 3: saran = "Superior Room"
+        elif jml_tamu <= 5: saran = "Deluxe Room"
+        else: saran = "Suite Room"
         st.info(f"Karena kamu bawa {jml_tamu} orang, cocoknya pilih **{saran}**.")
         
-        pemetaan_lantai = {"Standard Room": "1", "Superior Room": "2", "Deluxe Room": "3", "Suite Room": "4"}
-        lantai_target = pemetaan_lantai[pilihan_tipe]
-        kamar_cocok = next((k for k in st.session_state.kamar_data if k["Tipe Kamar"] == pilihan_tipe and k["Status"] == "🟩 Tersedia" and k["No Kamar"].startswith(lantai_target)), None)
-        
-        if kamar_cocok:
-            st.success(f"Kamar Ready! Kamu mendapatkan tipe **{pilihan_tipe}** dengan **No. {kamar_cocok['No Kamar']}** di Lantai {lantai_target}.")
-        else:
-            st.error(f"Waduh, tipe kamar {pilihan_tipe} di Lantai {lantai_target} saat ini sedang penuh.")
-
         st.markdown("---")
         st.subheader("🎁 Mau Tambah Fasilitas Ekstra?")
         addons = []
@@ -342,7 +343,7 @@ elif pilihan_menu == "📝 Reservasi Baru":
         if st.checkbox("Rental Skuter Listrik Seharian (+Rp 75.000)"): addons.append("Electric Scooter")
 
         if st.button("Booking & Lanjut Ke Pembayaran ➡️", type="primary"):
-            if not nama or not kamar_cocok or tgl_out <= tgl_in or email == "@gmail.com" or hp == "+62 ":
+            if not nama or not kamar_terpilih or tgl_out <= tgl_in or email == "@gmail.com" or hp == "+62 ":
                 st.error("Isi formnya yang bener dong, pastikan semua kolom data dan nomor handphone sudah terisi lengkap.")
             else:
                 biaya_extra_awal = (
@@ -359,9 +360,16 @@ elif pilihan_menu == "📝 Reservasi Baru":
                 
                 st.session_state.proses_checkout = {
                     "id_invoice": f"RSV-{datetime.now().strftime('%Y%m%d%H%M%S')}",
-                    "nama": nama, "hp": hp, "email": email, "kamar": kamar_cocok,
-                    "tipe": pilihan_tipe, "check_in": str(tgl_in), "check_out": str(tgl_out),
-                    "add_on": addons, "late_checkout": pilihan_late, "biaya_ekstra_total": biaya_extra_awal
+                    "nama": nama, 
+                    "hp": hp, 
+                    "email": email, 
+                    "kamar": kamar_terpilih,
+                    "tipe": pilihan_tipe, 
+                    "check_in": str(tgl_in), 
+                    "check_out": str(tgl_out),
+                    "add_on": addons, 
+                    "late_checkout": pilihan_late, 
+                    "biaya_ekstra_total": biaya_extra_awal
                 }
                 st.session_state.voucher_terpasang = "" 
                 st.success("Sip! Data udah kesimpen, gass ke sub-menu 'Pembayaran Tiket' buat memilih opsi pembayaran.")
@@ -410,12 +418,19 @@ elif pilihan_menu == "🗺️ Denah Kamar":
                     st.error(f"🟨 {detail['No Kamar']}\n(Ada yang booking)")
 
 # --- 5. PEMBAYARAN TIKET RESERVASI ---
-elif pilihan_menu == "💳 Pembayaran Tiket":
+elif pilihan_menu == "💳 Pembayaran Reservasi Hotel":
     st.title("💳 Menu Pembayaran Billing Kamar")
     # Validasi biar gak ada tamu ilegal yang masuk menu ini tanpa ngisi form reservasi dulu
     if "proses_checkout" not in st.session_state:
         st.warning("Belum ada antrian kamar yang mau dibayar nih. Buka menu 'Reservasi Baru' dulu ya.")
         st.stop()
+
+    dt = st.session_state.proses_checkout
+    # Ngitung berapa malam durasi menginap berdasarkan selisih tanggal check-in & check-out
+    malam = max(1, (datetime.strptime(dt["check_out"], "%Y-%m-%d") - datetime.strptime(dt["check_in"], "%Y-%m-%d")).days)
+    harga_pokok = TARIF_KAMAR.get(dt["tipe"], 0) * malam
+    biaya_extra = dt["biaya_ekstra_total"]
+    subtotal = harga_pokok + biaya_extra
 
     dt = st.session_state.proses_checkout
     # Ngitung berapa malam durasi menginap berdasarkan selisih tanggal check-in & check-out
@@ -517,10 +532,11 @@ elif pilihan_menu == "💳 Pembayaran Tiket":
             st.success("Pembayaran Berhasil Diterima! Kamar aman dipesan. Sisa tagihan (jika ada) akan dilunasi saat check-out.")
             st.rerun()
 
-# ==========================================
-# GANTI BAGIAN SUB-MENU CEK DETAIL & CHECK-OUT DENGAN KODE DI BAWAH INI
-# ==========================================
-
+            # merefresh agar angka berubah (autoo update timer)
+            import time
+            time.sleep(1)
+            st.rerun()
+                       
 # --- 6. CEK DETAIL & CHECK-OUT MANDIRI ---
 elif pilihan_menu == "🔍 Cek Detail & Check-Out":
     st.title("🔍 Menu Cek Data & Check-Out Mandiri (Akses Tamu)")
@@ -808,24 +824,56 @@ elif pilihan_menu == "💳 Bayar Room Service":
 # --- 10. PENILAIAN HOTEL ---
 elif pilihan_menu == "⭐ Ulasan Kepuasan":
     st.title("⭐ Kotak Kepuasan & Review Tamu")
-    # Form input ulasan kepuasan pelanggan/tamu hotel biar ada interaksi feedback
-    with st.form("form_ulasan"):
-        nama_tamu = st.text_input("Nama Kamu / No Kamar")
-        skor_rating = st.slider("Kasih Rating Bintang Berapa? (1 - 5)", 1, 5, 5)
-        komentar_tamu = st.text_area("Tulis Kesan Pesan Selama Liburan Di Sini")
+    st.write("Bagikan pengalaman menginapmu! Feedback kamu sangat berharga bagi kami.")
+
+    # Pastikan 'with st.form' dimulai di sini
+    with st.form("form_ulasan", clear_on_submit=True):
+        nama_tamu = st.text_input("Nama atau Nomor Kamar")
         
-        if st.form_submit_button("Kirim Review"):
+        # Rating dengan Radio Button (Sudah sesuai aturan form)
+        skor_rating = st.radio(
+            "Berapa Bintang Untuk Kami?",
+            options=[1, 2, 3, 4, 5],
+            format_func=lambda x: "⭐" * x,
+            horizontal=True,
+            index=4
+        )
+        
+        komentar_tamu = st.text_area("Tulis kesan-pesan kamu:")
+        
+        # TOMBOL HARUS DI DALAM INDENTASI 'with st.form'
+        submit_button = st.form_submit_button("Kirim Review ✨")
+        
+        # ATAU tepat di bawahnya jika sudah keluar blok 'with'
+        if submit_button:
             if nama_tamu and komentar_tamu:
                 st.session_state.ulasan_log.append({
-                    "nama": nama_tamu, "rating": skor_rating, "komentar": komentar_tamu
+                    "nama": nama_tamu, 
+                    "rating": skor_rating, 
+                    "komentar": komentar_tamu
                 })
-                st.success("Makasih banyak ya ulasannya!")
-                st.rerun()
+                st.balloons()
+                st.success("Terima kasih telah berbagi pengalaman dengan kami")
             else:
-                st.error("Isi dulu review-nya.")
-                
-    st.subheader("Semua Kumpulan Review Tamu")
-    st.dataframe(pd.DataFrame(st.session_state.ulasan_log), use_container_width=True)
+                st.error("Jangan lupa isi nama dan komentar ya!")
+            
+    st.markdown("---")
+    st.subheader("💬 Apa Kata Tamu Lain?")
+
+    for u in reversed(st.session_state.ulasan_log):
+        with st.container():
+            # Membuat rating bintang dengan warna emas
+            # Rating 5 = ⭐⭐⭐⭐⭐, Rating 1 = ⭐
+            bintang = "⭐" * u['rating']
+            
+            # Kita gunakan HTML/CSS agar terlihat lebih menonjol
+            st.markdown(f"""
+                <div style="background-color: #FFF0F5; padding: 15px; border-radius: 10px; border-left: 5px solid #FFD700; margin-bottom: 10px;">
+                    <div style="font-size: 20px; color: #FFD700;">{bintang}</div>
+                    <p style="margin: 5px 0; font-size: 16px;"><b>{u['nama']}</b></p>
+                    <p style="margin: 0; font-style: italic; color: #555;">"{u['komentar']}"</p>
+                </div>
+            """, unsafe_allow_html=True)
 
 # --- 11. PUSAT BANTUAN ---
 elif pilihan_menu == "❓ Pusat Bantuan":
@@ -838,16 +886,46 @@ elif pilihan_menu == "❓ Pusat Bantuan":
 
 # --- 12. KONTAK LAYANAN SERVICE ---
 elif pilihan_menu == "📞 Kontak Layanan Service":
-    st.title("📞 Kontak Hubung & Layanan Fast Respon")
-    # Informasi kontak darurat hotel buat kenyamanan dan rasa aman tamu selama menetap
-    st.markdown("""
-    <div class="card">
-        <h3>Layanan Operator Resepsionis (24 Jam Nonstop)</h3>
-        <p>Hubungi kontak di bawah kalau ada masalah darurat di kamar atau butuh bantuan teknisi.</p>
-        <ul>
-            <li><b>Telpon Kamar:</b> Pencet angka 0 langsung ke resepsionis</li>
-            <li><b>WhatsApp Chat:</b> 0812-3456-7890</li>
-            <li><b>Email Support:</b> care@denarahotel.com</li>
-        </ul>
-    </div>
-    """, unsafe_allow_html=True)
+    st.title("📞 Kontak Layanan Hotel")
+
+    # Informasi Hotel dengan Layout yang rapi
+    col1, col2 = st.columns([1, 2])
+    with col1:
+        st.write("🏨 **Denara Hotel**")
+        st.write("📍 **Alamat:**")
+        st.caption("Jl. Mawar No. 123, Indonesia")
+        st.write("📞 **Telepon:**")
+        st.caption("0812-3456-7890")
+        st.write("📧 **Email:**")
+        st.caption("denarahotel@gmail.com")
+    
+    with col2:
+        st.info("🕒 **Layanan Resepsionis 24 Jam**\nJangan ragu untuk menghubungi kami kapan saja jika Anda membutuhkan bantuan darurat atau layanan kamar.")
+
+    st.divider()
+
+    # Form Kirim Pesan yang lebih terstruktur
+    st.subheader("📩 Kirim Pesan ke Customer Service")
+    with st.form("form_kontak", clear_on_submit=True):
+        nama = st.text_input("Nama Lengkap")
+        subjek = st.text_input("Subjek Pesan")
+        pesan = st.text_area("Pesan Anda")
+        
+        submit_btn = st.form_submit_button("Kirim Pesan Sekarang 🚀")
+        
+        if submit_btn:
+            if nama and pesan:
+                # Disini kita bisa menyimpan pesan ke dalam sebuah list log khusus
+                # Jika ingin membuat log pesan baru, tambahkan 'pesan_masuk' ke st.session_state di bagian awal
+                if "pesan_masuk" not in st.session_state:
+                    st.session_state.pesan_masuk = []
+                
+                st.session_state.pesan_masuk.append({
+                    "nama": nama,
+                    "subjek": subjek,
+                    "pesan": pesan
+                })
+                
+                st.success(f"Terima kasih, {nama}! Pesan Anda telah kami terima dan akan segera diproses oleh tim kami.")
+            else:
+                st.error("Mohon isi Nama dan Pesan Anda terlebih dahulu.")
