@@ -530,22 +530,20 @@ elif pilihan_menu == "💳 Pembayaran Reservasi Hotel":
     
     # --- FITUR TAMBAHAN REKENING / NO E-WALLET ---
     if "Transfer" in metode or "Account" in metode:
-
-    no_sumber_bayar = st.text_input(
-        f"Masukkan Nomor Rekening Bank Anda ({metode}):",
-        placeholder="Contoh: 1234567890"
-    )
-    
-    if no_sumber_bayar:
-        if not no_sumber_bayar.isdigit():
-            st.error("Nomor rekening hanya boleh berisi angka.")
-        elif len(no_sumber_bayar) < 10:
-            st.error("Nomor rekening minimal 10 digit.")
-        elif len(no_sumber_bayar) > 16:
-            st.error("Nomor rekening maksimal 16 digit.")
-        else:
-            st.success("Nomor rekening valid.")
+        no_sumber_bayar = st.text_input(
+            f"Masukkan Nomor Rekening Bank Anda ({metode}):",
+            placeholder="Contoh: 1234567890"
+        )
         
+        if no_sumber_bayar:
+            if not no_sumber_bayar.isdigit():
+                st.error("Nomor rekening hanya boleh berisi angka.")
+            elif len(no_sumber_bayar) < 10:
+                st.error("Nomor rekening minimal 10 digit.")
+            elif len(no_sumber_bayar) > 16:
+                st.error("Nomor rekening maksimal 16 digit.")
+            else:
+                st.success("Nomor rekening valid.")
     else:
         no_sumber_bayar = st.text_input(
             f"Masukkan Nomor HP Akun {metode} Anda:",
